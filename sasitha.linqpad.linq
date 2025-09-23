@@ -1,49 +1,9 @@
-<Query Kind="Statements">
-  <Connection>
-    <ID>bc9c3d12-6db3-4887-bbea-0e5fee65e21e</ID>
-    <NamingServiceVersion>2</NamingServiceVersion>
-    <Persist>true</Persist>
-    <Server>SASITHALAPTOP\SQLEXPRESS01</Server>
-    <AllowDateOnlyTimeOnly>true</AllowDateOnlyTimeOnly>
-    <DeferDatabasePopulation>true</DeferDatabasePopulation>
-    <Database>StartTed-2025-Sept</Database>
-    <DriverData>
-      <LegacyMFA>false</LegacyMFA>
-    </DriverData>
-  </Connection>
-  <NuGetReference>Microsoft.Office.Interop.Excel</NuGetReference>
-  <NuGetReference>Microsoft.Office.Interop.Outlook</NuGetReference>
-  <NuGetReference>Microsoft.Office.Interop.PowerPoint</NuGetReference>
-  <NuGetReference>Microsoft.Office.Interop.Word</NuGetReference>
-  <Namespace>Excel = Microsoft.Office.Interop.Excel</Namespace>
-  <Namespace>Outlook = Microsoft.Office.Interop.Outlook</Namespace>
-  <Namespace>PowerPoint = Microsoft.Office.Interop.PowerPoint</Namespace>
-  <Namespace>Word = Microsoft.Office.Interop.Word</Namespace>
-  <IncludePredicateBuilder>true</IncludePredicateBuilder>
-  <IncludeLinqToSql>true</IncludeLinqToSql>
-  <DisableMyExtensions>true</DisableMyExtensions>
-  <RuntimeVersion>8.0</RuntimeVersion>
-  <TransactionIsolationLevel>ReadCommitted</TransactionIsolationLevel>
-</Query>
-
 //Q1 Story:
 //As the Student Life Analyst at NAIT, you've been asked by the Dean of Student Affairs to help promote engagement in all student clubs-especially those holding events off the beaten path. The Dean wants a clear, chronological lineup of every upcoming club activity (starting January 1, 2025) that takes place somewhere other than the standard "Scheduled Room," and isn't just the routine BTech Club meeting. This will feed into the new "Get Out & Get Involved" social-media campaign and guide students toward discovering fresh experiences on and off campus.
 //Requirements:
 //The report should include only those club activities scheduled on or after January 1, 2025, omitting any whose campus venue is labeled "Scheduled Room" or whose name is "BTech Club Meeting." For each qualifying event, it must list the event's start date, the venue name, the hosting club's name, and the activity title, and then present all entries in ascending order by start date.
-var getInvolvedEvents = ClubActivities
-    .Where(ca => ca.StartDate >= new DateTime(2025, 01, 01)
-              && ca.Name != "BTech Club Meeting"
-              && ca.CampusVenue.Location != "Scheduled Room")
-    .Select(ca => new {
-        StartDate = ca.StartDate,
-        Location = ca.CampusVenue.Location,
-        Club = ca.Club.ClubName,
-        Activity = ca.Name
-    })
-    .OrderBy(ca => ca.StartDate);
-
+var getInvolvedEvents = ClubActivities.Where(ca=> ca.StartDate >= new DateTime(2025, 01,01) && ca.Name != "BTech Club Meeting"  && ca.CampusVenue.Location != "Scheduled Room").OrderBy(ca=> ca.StartDate).Select(ca=> new { StartDate = ca.StartDate, Location = ca.CampusVenue.Location, Club = ca.Club.ClubName, Activity = ca.Name});
 getInvolvedEvents.Dump("Get out & Get Involved");
-
  
  //Question 2 
  //Question 2 (2 Marks)
@@ -51,7 +11,7 @@ getInvolvedEvents.Dump("Get out & Get Involved");
 //As the Academic Planning Analyst at NAIT, you've been asked to generate a comprehensive overview of every program offered across our schools that meets accreditation requirements. Your report will translate each school code into a friendly name, tally how many courses in each program are mandatory versus optional, and then highlight only those programs that have at least twenty-two required courses, so department heads can prioritize resourcing and scheduling decisions.
 //Requirements:
 //You must map SchoolCode to its full school name ("SAMIT" → "School of Advance Media and IT", "SEET" → "School of Electrical Engineering Technology", all others → "Unknown"), include each program name, count the number of required courses and optional courses, filter to only those with required course count greater than or equal to 22, and order the final list by program name in ascending order.
-var ProgramCoursesSchoolEvents =Programs.Where(p=> ProgramCourses.Count(pc=> pc.ProgramID == p.ProgramID && pc.Required) >= 22).Select(p=> new {School = p.SchoolCode == "SAMIT" ? "School of Advanced Media And IT" : p.SchoolCode == "SEET" ? "School of Electrical Engineering" : "Unknown", ProgramName = p.ProgramName, RequiredCount = ProgramCourses.Count(pc=> pc.ProgramID == p.ProgramID && pc.Required), OptionalCount = ProgramCourses.Count(pc=> pc.ProgramID == p.ProgramID && !pc.Required)}).OrderBy(p=> p.ProgramName);
+var ProgramCoursesSchoolEvents =Programs.Where(p=> ProgramCourses.Count(pc=> pc.ProgramID == p.ProgramID && pc.Required) >= 22).OrderBy(p=> p.ProgramName).Select(p=> new {School = p.SchoolCode == "SAMIT" ? "School of Advanced Media And IT" : p.SchoolCode == "SEET" ? "School of Electrical Engineering" : "Unknown", ProgramName = p.ProgramName, RequiredCount = ProgramCourses.Count(pc=> pc.ProgramID == p.ProgramID && pc.Required), OptionalCount = ProgramCourses.Count(pc=> pc.ProgramID == p.ProgramID && !pc.Required)});
 ProgramCoursesSchoolEvents.Dump("Program Courses 22 + Requirements");
 
 //Question 3 
